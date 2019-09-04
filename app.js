@@ -4,7 +4,7 @@ const port = 3000
 
 app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'));
 
-app.listen(port, () => console.log(`Listening on port ${port}!`))
+app.listen(process.env.PORT || port, () => console.log(`Listening on port ${port}!`))
 
 //load images
 app.use(express.static('public'));
