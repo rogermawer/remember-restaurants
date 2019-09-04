@@ -219,7 +219,7 @@ const locationError = () => {
 const insertAddress = (lat, long) => {
     //return printed address from mapquest api
     var currentLocationString = "";
-    var url = `http://www.mapquestapi.com/geocoding/v1/reverse?key=IAgZTUY6CHjddilw58OA0RkulD9TIhNF&location=${lat},${long}`;
+    var url = `https://www.mapquestapi.com/geocoding/v1/reverse?key=IAgZTUY6CHjddilw58OA0RkulD9TIhNF&location=${lat},${long}`;
     $.ajax({
         url: url,
         success: function(response){
