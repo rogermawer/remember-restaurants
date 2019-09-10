@@ -175,7 +175,7 @@ $(document).ready(function(){
         
         // open the hidden window
         $('#result').toggleClass('showSideWindow')
-        $('#result').not(':first').empty(); //clear items in result div EXCEPT the button to close so new search appears at top
+        $('#result .content').empty(); //clear items in result div EXCEPT the button to close so new search appears at top
         var searchTerm = {
         restaurant: $('input[name="restaurant"]').val(),
         location: $('input[name="location"]').val()

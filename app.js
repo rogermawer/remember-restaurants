@@ -36,10 +36,10 @@ app.post('/search', (req, res) => {
         });
 });
 
-app.post('/results', (req, res) => {
-    res.send('hello');
-    
-});
+//app.post('/results', (req, res) => {
+//    res.send('hello');
+//    
+//});
 
 
 
