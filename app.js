@@ -4,6 +4,7 @@ const port = 3000
 
 app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'));
 
+//process.env.PORT allows to look on all ports.
 app.listen(process.env.PORT || port, () => console.log(`Listening on port ${port}!`))
 
 //load images
@@ -31,15 +32,18 @@ app.post('/search', (req, res) => {
         var prettyJson = JSON.stringify(firstResult, null, 4);
         var resultImage = firstResult.image_url;
         res.send(firstResult); //this data gets sent to index.html
+        app.route('/results').get(function(req, res) {
+    res.send(firstResult);
+        })
         }).catch(e => {
-        res.send(e);
+        //if error
+            res.send(e);
         });
 });
 
-//app.post('/results', (req, res) => {
-//    res.send('hello');
-//    
-//});
+
+//use route when someone navigates to the following page, the code executes.
+
 
 
 

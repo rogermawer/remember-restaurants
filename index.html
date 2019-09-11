@@ -186,23 +186,22 @@ $(document).ready(function(){
                 $("#result").html(`Didn't find any results for that.`)
             }
             //otherwise...
-        bizSearchResults = result;
-        $.each(result, function(i, val){
-            try {
-              var locationArray = result[i].location.display_address;
-              var categoriesArray = result[i].categories;
-              storeBusinessinElement(result[i], categoriesArray, locationArray);
-            }catch(error){
-                $("#result").html(`Something bad happened. Couldn't connect.`)
-            }
+            bizSearchResults = result;
+            storeBusinessinResults(bizSearchResults);
         })
-        //put results on page
-        $.post('/results', null, function(result){
-            $('#result').append(result)
-    })
-         
     }) 
+    
+$('#sort-rating').click(function(){
+    $('#result .content').empty();
+    var results = sortByRating(bizSearchResults);
+    storeBusinessinResults(results);
 })
+$('#sort-distance').click(function(){
+    $('#result .content').empty();
+    var results = sortByDistance(bizSearchResults);
+    storeBusinessinResults(results);
+})
+
 
     
 const locationSuccess = (position) => {
@@ -283,7 +282,8 @@ const hideWindow = (e) => {
     <div class="flex-container">
         
       <div class="nav" id="result">
-<!--          <button onclick="hideWindow(this)" class="save-button align-right close">X</button>-->
+          <button id="sort-distance" class="align-right">Sort by Distance</button>
+          <button id="sort-rating" class="align-right">Sort by Rating</button>
         <div class="content">
           
         </div>
@@ -325,7 +325,13 @@ const hideWindow = (e) => {
     // navigation/location functions
 //use mapquest api to reverse geocode: http://www.mapquestapi.com/geocoding/v1/reverse?key=KEY&location=30.333472,-81.470448
 
-
+    //sorting functions
+const sortByRating = (bizSearchResults) => {
+    return Array.from(bizSearchResults).sort((h ,l) => l.rating - h.rating);
+}
+const sortByDistance = (bizSearchResults) => {
+    return Array.from(bizSearchResults).sort((c ,f) => c.distance - f.distance);
+}
 
 
 
@@ -347,17 +353,29 @@ const printCategories = (array) => {
     })
     return printedCategories;
 }
-const storeBusinessinElement = (business, categoriesArray, locationArray) => {
-    var businessName = `<h1 class="business-title" id="biz-title">${business.name}</h1>`;
-    var businessCategories = `<p id="biz-categories">${printCategories(categoriesArray)}</p>`;
-    var businessLocation = `<p id="biz-location">${printLocation(locationArray)}</p>`;
-    var businessImage = `<p><img id="biz-img" class="img-contain" src=${business.image_url}></p>`;
-    var saveBusiness = `<button class="save-button" onclick="saveBusiness(this, bizSearchResults)">Save this place.</button`;
-    return ($("#result .content").append(`<div data-bizid=${business.id}>${businessName}${businessCategories}${businessLocation}${businessImage}${saveBusiness}</div>`))
+//for results side
+const storeBusinessinResults = (business) => {
+    business.forEach(function(val){
+        try {
+            var locationArray = val.location.display_address;
+            var categoriesArray = val.categories;
+            var businessName = `<h1 class="business-title" id="biz-title">${val.name}</h1>`;
+            var businessCategories = `<p id="biz-categories">${printCategories(categoriesArray)}</p>`;
+            var businessLocation = `<p id="biz-location">${printLocation(locationArray)}</p>`;
+            var businessImage = `<p><img id="biz-img" class="img-contain" src=${val.image_url}></p>`;
+            var businessRating = `<p>Rating: ${val.rating}</p>`;
+            var saveBusiness = `<button class="save-button" onclick="saveBusiness(this, bizSearchResults)">Save this place.</button`;
+                //
+            return ($("#result .content").append(`<div data-bizid=${val.id}>${businessName}${businessCategories}${businessLocation}${businessImage}${businessRating}${saveBusiness}</div>`))
+        }catch(error){
+            $("#result").html(error)
+        }
+    })
+    return
 }
 
-// display items from local storage
-const displayBusinesses = (bizArray) => {
+// display items from local storage for saved side
+const storeBusinessinSaved = (bizArray) => {
     bizArray.forEach(function(i){
         var businessName = `<h1 class="business-title">${i.name}</h1>`;
         var businessCategories = `<p>${i.categories}</p>`;
@@ -378,7 +396,7 @@ const getSavedBusinesses = () => {
     }
     return savedBusinesses
 }
-displayBusinesses(getSavedBusinesses());
+storeBusinessinSaved(getSavedBusinesses());
 
 // for dev... clear localstorage
 const clearLocalStorage = () => {
@@ -399,8 +417,8 @@ const saveBusiness = (event, searchResults) => {
     var doesBizExist = savedBusinesses.filter(index => index.id == data.id);
     if (doesBizExist.length <= 0){
         //if doesnt exists then save it.
-        savedBusinesses.push(data);
-        displayBusinesses(Array(data))//need to convert to array to fit the function
+        savedBusinesses.push(data); 
+        storeBusinessinSaved(Array(data))//need to convert to array to fit the function
         localStorage.setItem('businesses', JSON.stringify(savedBusinesses));
     }else{
         console.log('already saved this place')
