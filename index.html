@@ -105,6 +105,10 @@
         padding: 5px 10px 5px 10px;
         background-color: yellow;
     }
+    .navigate-button{
+        padding: 5px 10px 5px 10px;
+        background-color: green;
+    }
     .align-right {
         margin-left: auto
     }
@@ -363,9 +367,10 @@ const storeBusinessinResults = (business) => {
             var businessLocation = `<p id="biz-location">${printLocation(locationArray)}</p>`;
             var businessImage = `<p><img id="biz-img" class="img-contain" src=${val.image_url}></p>`;
             var businessRating = `<p>Rating: ${val.rating}</p>`;
-            var saveBusiness = `<button class="save-button" onclick="saveBusiness(this, bizSearchResults)">Save this place.</button`;
+            var saveBusiness = `<button class="save-button" onclick="saveBusiness(this, bizSearchResults)">Save this place.</button>`;
+            var navigateButton = `<button class="navigate-button" onclick="openBusinessInMaps(this, bizSearchResults)">Open in Maps.</button>`;
                 //
-            return ($("#result .content").append(`<div data-bizid=${val.id}>${businessName}${businessCategories}${businessLocation}${businessImage}${businessRating}${saveBusiness}</div>`))
+            return ($("#result .content").append(`<div data-bizid=${val.id}>${businessName}${businessCategories}${businessLocation}${businessImage}${businessRating}${saveBusiness}${navigateButton}</div>`))
         }catch(error){
             $("#result").html(error)
         }
@@ -380,7 +385,7 @@ const storeBusinessinSaved = (bizArray) => {
         var businessCategories = `<p>${i.categories}</p>`;
         var businessLocation = `<p>${i.location}</p>`;
         var businessImage = `<p><img class="img-contain" src=${i.img}></p>`;
-        var removeBusiness = `<button class="remove-button" onclick="removeBusiness(this)">Remove from saved.</button`;
+        var removeBusiness = `<button class="remove-button" onclick="removeBusiness(this)">Remove from saved.</button>`;
         return ($("#saved .content").append(`<div data-bizid="${i.id}">${businessName}${businessCategories}${businessLocation}${businessImage}${removeBusiness}</div>`))
     })
 }
@@ -422,6 +427,11 @@ const saveBusiness = (event, searchResults) => {
     }else{
         console.log('already saved this place')
     }
+}
+
+const openBusinessInMaps = (event, searchResults) => {
+    console.log(`${event.parentElement.querySelector('#biz-location').innerHTML}`)
+    window.open(`https://www.google.com/maps/place/${event.parentElement.querySelector('#biz-location').innerHTML}`)
 }
 
 const removeBusiness = (domElement) => {
