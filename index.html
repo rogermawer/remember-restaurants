@@ -157,9 +157,11 @@
     
     .expand-button{
         flex-direction: row;
-    }
-    .expand-button{
         width:75px;
+    }
+    .remove-button{
+        background-color: #F84343;
+        color: #eeeeee
     }
     .side-menu{
         display: flex;
@@ -318,7 +320,7 @@ const hideWindow = (e) => {
         
       <div class="nav" id="saved">
 <!--          <button onclick="hideWindow(this)" class="save-button close">X</button>-->
-        <div class="content">
+        <div class="content" style="padding-top:40px">
           
         </div>
       </div>
@@ -395,7 +397,7 @@ const storeBusinessinResults = (business) => {
             var businessImage = `<p><img id="biz-img" class="img-contain" src=${val.image_url}></p>`;
             var businessRating = `<p>Rating: ${val.rating}</p>`;
             var saveBusiness = `<button class="save-button generic-button" onclick="saveBusiness(this, bizSearchResults)">Save this place.</button>`;
-            var navigateButton = `<button class="navigate-button generic-button" onclick="openBusinessInMaps(this, bizSearchResults)"><i class="far fa-map"></i></button>`;
+            var navigateButton = `<button class="navigate-button generic-button" onclick="openBusinessInMaps(this)"><i class="far fa-map"></i></button>`;
                 //
             return ($("#result .content").append(`<div class="businesses" data-bizid=${val.id}>${businessName}${businessCategories}${businessLocation}${businessImage}${businessRating}${saveBusiness}${navigateButton}</div>`))
         }catch(error){
@@ -412,8 +414,9 @@ const storeBusinessinSaved = (bizArray) => {
         var businessCategories = `<p>${i.categories}</p>`;
         var businessLocation = `<p>${i.location}</p>`;
         var businessImage = `<p><img class="img-contain" src=${i.img}></p>`;
-        var removeBusiness = `<button class="remove-button" onclick="removeBusiness(this)">Remove from saved.</button>`;
-        return ($("#saved .content").append(`<div data-bizid="${i.id}">${businessName}${businessCategories}${businessLocation}${businessImage}${removeBusiness}</div>`))
+        var removeBusiness = `<button class="remove-button generic-button" onclick="removeBusiness(this)">Remove from saved.</button>`;
+        var navigateButton = `<button class="navigate-button generic-button" onclick="openSavedBusinessInMaps(this)" data-location="${i.location}"><i class="far fa-map"></i></button>`;
+        return ($("#saved .content").append(`<div class="businesses" data-bizid="${i.id}">${businessName}${businessCategories}${businessLocation}${businessImage}${removeBusiness}${navigateButton}</div>`))
     })
 }
 
@@ -456,10 +459,6 @@ const saveBusiness = (event, searchResults) => {
     }
 }
 
-const openBusinessInMaps = (event, searchResults) => {
-    console.log(`${event.parentElement.querySelector('#biz-location').innerHTML}`)
-    window.open(`https://www.google.com/maps/place/${event.parentElement.querySelector('#biz-location').innerHTML}`)
-}
 
 const removeBusiness = (domElement) => {
     var businessToRemove = domElement.parentElement;
@@ -470,6 +469,13 @@ const removeBusiness = (domElement) => {
     localStorage.setItem('businesses', JSON.stringify(doesBizExist))
 }
 
+const openBusinessInMaps = (event) => {
+    console.log(event)
+    window.open(`https://www.google.com/maps/place/${event.parentElement.querySelector('#biz-location').innerHTML}`)
+}
+const openSavedBusinessInMaps = (event) => {
+    window.open(`https://www.google.com/maps/place/${event.getAttribute('data-location')}`)
+}
 
       </script>
       
