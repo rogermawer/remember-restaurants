@@ -17,6 +17,8 @@
     
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="js/push.js"></script>
+    
    
 <style>
     html, body {
@@ -167,6 +169,7 @@
         display: flex;
         flex-flow: row;
         justify-content: flex-end;
+        padding-top:10px
     }
     
     .menu {
@@ -278,8 +281,13 @@ $('#expand-saved').click(function() {
     $('#saved').toggleClass('showSideWindow')
     });
     
+    
 
+//push notices
 
+$('button').click(function(){
+    Push.create('found you.')
+})
 
 });
    
@@ -314,7 +322,7 @@ const hideWindow = (e) => {
             <button id="sort-rating" class="generic-button">Sort by Rating</button>
           </div>
         <div class="content">
-          
+            
         </div>
       </div>
         
@@ -328,8 +336,8 @@ const hideWindow = (e) => {
       <div class="main-contain-centered">
           <div class="toolbar">
               <ul class="menu">
-                  <li id='expand-results'>RESULTS</li>
-                  <li id='expand-saved'>SAVED</li>
+                  <li id='expand-results'>SEARCH</li>
+                  <li id='expand-saved'>REMEMBER</li>
               </ul>
           </div>
           <div class="form-container">
@@ -340,7 +348,7 @@ const hideWindow = (e) => {
             </form>
               
               <div style="width: 200px;justify-content: center;display: flex">
-                  <button id="submit" class="generic-button" value="Submit!" type="submit"><i class="fas fa-search hidden"></i><img style="width: 20px;" class="loading" src="/img/loading.gif"></button>
+                  <button id="submit" class="generic-button" value="Submit!" type="submit"><i class="fas fa-search hidden"></i><i class="fas fa-spinner fa-pulse"></i></button>
                   <button id="find-me" class="generic-button" style="width: 20%;background-color: #8fb57e"><i class="fas fa-map-marker-alt"></i></button>
               </div>
           </div>
