@@ -18,6 +18,7 @@
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="js/push.js"></script>
+      <script src="js/serviceWorker.min.js"></script>
     
    
 <style>
@@ -285,9 +286,11 @@ $('#expand-saved').click(function() {
 
 //push notices
 
-$('button').click(function(){
-    Push.create('found you.')
-})
+$('#find-me').click(function(){
+    setTimeout(function(){
+        Push.create('found you.')
+},5000);
+});
 
 });
    
