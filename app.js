@@ -35,7 +35,7 @@ app.post('/search', (req, res) => {
         app.route('/results').get(function(req, res) {
     res.send(firstResult);
         })
-        Push.create("Hello world!");
+        
         }).catch(e => {
         //if error
             res.send(e);
