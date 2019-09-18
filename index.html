@@ -213,12 +213,17 @@ $(document).ready(function(){
         };
         $.post(url, searchTerm, function(result){
             // if didnt find results for search...
-            if (result.length < 1){
-                $("#result").html(`Didn't find any results for that.`)
+            try{
+                if (result.length < 1){
+                    $("#result").append(`Didn't find any results for that.`)
+                }else{
+                //otherwise...
+                bizSearchResults = result;
+                storeBusinessinResults(bizSearchResults);
+                }
+            }catch(error){
+                $("#result").append(`Couldn't find you location. Try typing in an address or city?`)
             }
-            //otherwise...
-            bizSearchResults = result;
-            storeBusinessinResults(bizSearchResults);
         })
     }) 
     
@@ -412,7 +417,7 @@ const storeBusinessinResults = (business) => {
                 //
             return ($("#result .content").append(`<div class="businesses" data-bizid=${val.id}>${businessName}${businessCategories}${businessLocation}${businessImage}${businessRating}${saveBusiness}${navigateButton}</div>`))
         }catch(error){
-            $("#result").html(error)
+            $("#result").html(error);
         }
     })
     return
