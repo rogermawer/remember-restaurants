@@ -162,6 +162,9 @@
         flex-direction: row;
         width:75px;
     }
+    #expand-saved{
+        cursor: pointer
+    }
     .remove-button{
         background-color: #F84343;
         color: #eeeeee
@@ -224,6 +227,10 @@
   cursor: pointer;
   font-size: 25px
 }
+    
+    .opened{
+        width:50%!important
+    }
 </style>
   
 <script>
@@ -341,13 +348,6 @@ const hideWindow = (e) => {
     $(e).parent().css('width', '0');
 }   
     
-// hides parent element of selected (clicked) element. 'e' is 'this'
-// const hideWindow = (e) => {
-//    $(e).parent().toggleClass('hidden');
-//}   
- 
-
-
 
 </script>
 </head>
@@ -372,7 +372,7 @@ const hideWindow = (e) => {
       <button id="sort-distance" class="generic-button">Sort by Distance</button>
       <button id="sort-rating" class="generic-button">Sort by Rating</button>
     </div>
-    <div class="content"></div>
+    <div class="content"><p>Try searching for something!</p></div>
 </div>
         
 <div class="nav" id="saved">
@@ -534,26 +534,16 @@ const openSavedBusinessInMaps = (event) => {
 
       </script>
 <script>
-//function openMenuNav() {
-//  document.getElementById("sidenav").style.width = "50%";
-////  document.getElementById("main-body").style.marginLeft = "250px";
-//}
+
 function openLeftNav() {
-  document.getElementById("result").style.width = "50%";
-//  document.getElementById("main-body").style.marginLeft = "250px";
+  document.getElementById("result").classList.toggle('opened');
 }
 function openRightNav() {
-  document.getElementById("saved").style.width = "50%";
-//  document.getElementById("main-body").style.marginLeft = "250px";
+  document.getElementById("saved").classList.toggle('opened');
 }
-
-
-/* Set the width of the side navigation to 0 and the left margin of the page content to 0, and the background color of body to white */
 function closeNav() {
-//    document.getElementById("sidenav").style.width = "0";
-    document.getElementById("result").style.width = "0";
-    document.getElementById("saved").style.width = "0";
-//  document.getElementById("main-body").style.marginLeft = "inherit";
+    document.getElementById("result").classList.remove('opened');
+    document.getElementById("saved").classList.remove('opened');
 }
 </script>
       
