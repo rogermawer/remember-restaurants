@@ -181,6 +181,7 @@
         list-style:none;
         margin:0;
         padding:10px;
+        z-index: 99
     }
     .menu li{
         border:1px solid black;
@@ -193,6 +194,36 @@
         display: flex;
         flex-flow: column;
     }
+    
+.sidenav {
+  height: 100%; 
+  width: 0; 
+  position: fixed;
+  z-index: 1; 
+  top: 0; 
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden; 
+  padding-top: 60px; 
+  transition: 0.5s;
+}
+.sidenav a{
+  display: block;
+}
+.sidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+  color: #fff;
+}
+#menu-icon{
+    position: absolute;
+  padding:20px;
+  cursor: pointer;
+  font-size: 25px
+}
 </style>
   
 <script>
@@ -201,11 +232,11 @@ $(document).ready(function(){
     const url = '/search';
     $('#submit').click(function(e){
         e.preventDefault();
+        $('#submit').children().toggleClass('hidden');
         
         // TODO add loading icon
         
         // open the hidden window
-        $('#result').toggleClass('showSideWindow')
         $('#result .content').empty(); //clear items in result div EXCEPT the button to close so new search appears at top
         var searchTerm = {
         restaurant: $('input[name="restaurant"]').val(),
@@ -214,12 +245,14 @@ $(document).ready(function(){
         $.post(url, searchTerm, function(result){
             // if didnt find results for search...
             try{
+                openLeftNav();
                 if (result.length < 1){
                     $("#result .content").html(`Didn't find any results for that.`)
                 }else{
                 //otherwise...
                 bizSearchResults = result;
                 storeBusinessinResults(bizSearchResults);
+                $('#submit').children().toggleClass('hidden');
                 }
             }catch(error){
                 $("#result .content").html(`Couldn't find your location. Try typing in an address or city?`)
@@ -280,12 +313,12 @@ $('#find-me').click(function(){
     
 // hide/show results and saved
 
-$('#expand-results').click(function(){
-    $('#result').toggleClass('showSideWindow')
-});                       
-$('#expand-saved').click(function() {
-    $('#saved').toggleClass('showSideWindow')
-    });
+//$('#expand-results').click(function(){
+//    $('#result').toggleClass('showSideWindow')
+//});                       
+//$('#expand-saved').click(function() {
+//    $('#saved').toggleClass('showSideWindow')
+//    });
     
     
 
@@ -320,34 +353,39 @@ const hideWindow = (e) => {
 </head>
     
 <body>
-<div class="container">
+<!--
+<div id="sidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  <a href="#">Log Out</a>
+</div>
+<span onclick="openMenuNav()" id="menu-icon"><i class="fas fa-bars"></i></span>
+-->
+<div class="toolbar">
+    <ul class="menu">
+        <li onclick="openLeftNav()" id='expand-results'>SEARCH</li>
+        <li onclick="openRightNav()" id='expand-saved'>REMEMBER</li>
+    </ul>
+</div>
+    
+<div class="nav" id="result">
+    <div class="side-menu">
+      <button id="sort-distance" class="generic-button">Sort by Distance</button>
+      <button id="sort-rating" class="generic-button">Sort by Rating</button>
+    </div>
+    <div class="content"></div>
+</div>
+        
+<div class="nav" id="saved">
+    <div class="content" style="padding-top:40px"></div>
+</div>
+    
+    
+<div class="container" onclick="closeNav()">
     
     <div class="flex-container">
         
-      <div class="nav" id="result">
-          <div class="side-menu">
-            <button id="sort-distance" class="generic-button">Sort by Distance</button>
-            <button id="sort-rating" class="generic-button">Sort by Rating</button>
-          </div>
-        <div class="content">
-            
-        </div>
-      </div>
-        
-      <div class="nav" id="saved">
-<!--          <button onclick="hideWindow(this)" class="save-button close">X</button>-->
-        <div class="content" style="padding-top:40px">
-          
-        </div>
-      </div>
-        
       <div class="main-contain-centered">
-          <div class="toolbar">
-              <ul class="menu">
-                  <li id='expand-results'>SEARCH</li>
-                  <li id='expand-saved'>REMEMBER</li>
-              </ul>
-          </div>
+          
           <div class="form-container">
             <h1 class="business-title">remember a restaurant</h1>
             <form class="searchForm" method="POST" action="/search">
@@ -421,6 +459,15 @@ const storeBusinessinResults = (business) => {
     return
 }
 
+// get items in local storage, return array
+const getSavedBusinesses = () => {
+    var savedBusinesses = [];
+    if ('businesses' in localStorage){
+        savedBusinesses = JSON.parse(localStorage.getItem('businesses'));
+    }
+    return savedBusinesses
+}
+
 // display items from local storage for saved side
 const storeBusinessinSaved = (bizArray) => {
     bizArray.forEach(function(i){
@@ -434,17 +481,12 @@ const storeBusinessinSaved = (bizArray) => {
     })
 }
 
-
-
-// get items in local storage, return array
-const getSavedBusinesses = () => {
-    var savedBusinesses = [];
-    if ('businesses' in localStorage){
-        savedBusinesses = JSON.parse(localStorage.getItem('businesses'));
-    }
-    return savedBusinesses
-}
 storeBusinessinSaved(getSavedBusinesses());
+
+    
+    
+    
+    
 
 // for dev... clear localstorage
 const clearLocalStorage = () => {
@@ -484,7 +526,6 @@ const removeBusiness = (domElement) => {
 }
 
 const openBusinessInMaps = (event) => {
-    console.log(event)
     window.open(`https://www.google.com/maps/place/${event.parentElement.querySelector('#biz-location').innerHTML}`)
 }
 const openSavedBusinessInMaps = (event) => {
@@ -492,7 +533,29 @@ const openSavedBusinessInMaps = (event) => {
 }
 
       </script>
-      
+<script>
+//function openMenuNav() {
+//  document.getElementById("sidenav").style.width = "50%";
+////  document.getElementById("main-body").style.marginLeft = "250px";
+//}
+function openLeftNav() {
+  document.getElementById("result").style.width = "50%";
+//  document.getElementById("main-body").style.marginLeft = "250px";
+}
+function openRightNav() {
+  document.getElementById("saved").style.width = "50%";
+//  document.getElementById("main-body").style.marginLeft = "250px";
+}
+
+
+/* Set the width of the side navigation to 0 and the left margin of the page content to 0, and the background color of body to white */
+function closeNav() {
+//    document.getElementById("sidenav").style.width = "0";
+    document.getElementById("result").style.width = "0";
+    document.getElementById("saved").style.width = "0";
+//  document.getElementById("main-body").style.marginLeft = "inherit";
+}
+</script>
       
     
     

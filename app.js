@@ -33,7 +33,7 @@ app.post('/search', (req, res) => {
         var resultImage = firstResult.image_url;
         res.send(firstResult); //this data gets sent to index.html
         app.route('/results').get(function(req, res) {
-    res.send(firstResult);
+            res.send(firstResult);
         })
         
         }).catch(e => {
