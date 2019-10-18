@@ -22,6 +22,10 @@
     
    
 <style>
+    ::-webkit-scrollbar {
+        display: none
+    }
+    
     html, body {
         font-family: 'Roboto', sans-serif;
         font-weight: 300;
@@ -43,13 +47,15 @@
     h1{
         font-weight: 300
     }
-    .container{
+    .height-100{
         height: 100%
+    }
+    .flexin{
+        display: flex;
+        flex-direction: row;
     }
     .flex-container{
         height: 100%;
-        display: flex;
-        flex-direction: row;
     }
     .form-container{
         display: flex;
@@ -91,7 +97,7 @@
         flex-direction: column;
         height: 100%;
         overflow-y:scroll;
-        width:50%;
+        width:0;
     }
     .loading{
         line-height: 0px;
@@ -117,21 +123,28 @@
         padding: 5px 10px 5px 10px;
         background-color: yellow;
     }
+    .remove-button{
+        background-color: #F84343;
+        color: #eeeeee
+    }
     .navigate-button{
-        padding: 5px 10px 5px 10px;
         background-color: #8fb57e;
     }
-    .align-right {
-        margin-left: auto
+    .expand-button{
+        flex-direction: row;
+        width:75px;
     }
     .generic-button{
-        padding:10px 5px 10px 5px;
+        padding: 10px;
         border-radius: 5px;
         margin-bottom: 10px;
         border: none;
-        height: 40px;
         font-size: 15px;
-        margin-left: 2px
+        margin-left: 2px;
+        cursor: pointer
+    }
+     .align-right {
+        margin-left: auto
     }
     .hidden{
         display: none!important
@@ -141,7 +154,6 @@
     }
     #result{
         background-color:#eeeeee;
-        width:0;
         background: rgba(75, 75, 75, 0.8);
         color: #fff;
         transition: .2s
@@ -149,7 +161,6 @@
     #saved{
         background-color: #eeeeee;
         right:0;
-        width:0;
         background: rgba(75, 75, 75, 0.8);
         color: #fff;
         transition: .2s
@@ -157,23 +168,18 @@
     .business-title{
         color: #F84343
     }
-    
-    .expand-button{
-        flex-direction: row;
-        width:75px;
-    }
     #expand-saved{
         cursor: pointer
     }
-    .remove-button{
-        background-color: #F84343;
-        color: #eeeeee
+    #expand-results{
+        cursor: pointer
     }
     .side-menu{
         display: flex;
         flex-flow: row;
-        justify-content: flex-end;
-        padding-top:10px
+        justify-content: flex-start;
+        padding-left: 20px;
+        margin-top:70px
     }
     
     .menu {
@@ -196,6 +202,9 @@
     .businesses{
         display: flex;
         flex-flow: column;
+    }
+    .opened{
+        width:50%
     }
     
 .sidenav {
@@ -228,9 +237,13 @@
   font-size: 25px
 }
     
-    .opened{
-        width:50%!important
-    }
+/* MEDIA QUERIES */
+    
+@media only screen and (max-width: 600px) {
+    .opened{width:80%}
+}
+    
+
 </style>
   
 <script>
@@ -239,7 +252,7 @@ $(document).ready(function(){
     const url = '/search';
     $('#submit').click(function(e){
         e.preventDefault();
-        $('#submit').children().toggleClass('hidden');
+        hideShowSearchSpinner();
         
         // TODO add loading icon
         
@@ -256,10 +269,10 @@ $(document).ready(function(){
                 if (result.length < 1){
                     $("#result .content").html(`Didn't find any results for that.`)
                 }else{
-                //otherwise...
-                bizSearchResults = result;
-                storeBusinessinResults(bizSearchResults);
-                $('#submit').children().toggleClass('hidden');
+                    //otherwise...
+                    bizSearchResults = result;
+                    storeBusinessinResults(bizSearchResults);
+                    hideShowSearchSpinner();
                 }
             }catch(error){
                 $("#result .content").html(`Couldn't find your location. Try typing in an address or city?`)
@@ -277,65 +290,6 @@ $('#sort-distance').click(function(){
     var results = sortByDistance(bizSearchResults);
     storeBusinessinResults(results);
 })
-
-
-    
-const locationSuccess = (position) => {
-    // return a city/state string from lat and long
-    var lat = position.coords.latitude;
-    var long = position.coords.longitude;
-    insertAddress(lat, long);
-
-}
-const locationError = () => {
-    $('#submit').children().toggleClass('hidden');
-}
-
-const insertAddress = (lat, long) => {
-    //return printed address from mapquest api
-    var currentLocationString = "";
-    var url = `https://www.mapquestapi.com/geocoding/v1/reverse?key=IAgZTUY6CHjddilw58OA0RkulD9TIhNF&location=${lat},${long}`;
-    $.ajax({
-        url: url,
-        success: function(response){
-            currentLocationString = `${response.results[0].locations[0].street}, ${response.results[0].locations[0].adminArea5}, ${response.results[0].locations[0].adminArea3}`;
-            $("#location").val(currentLocationString);
-            // remove loading gif
-            $('#submit').children().toggleClass('hidden');
-        }
-    })
-}    
-    
-const findMe = () => {
-    navigator.geolocation.getCurrentPosition(locationSuccess, locationError);
-}
-
-findMe(); //get current location on load
-    
-//or when DOM button is clicked
-$('#find-me').click(function(){
-    $('#submit').children().toggleClass('hidden');
-    findMe();
-})
-    
-// hide/show results and saved
-
-//$('#expand-results').click(function(){
-//    $('#result').toggleClass('showSideWindow')
-//});                       
-//$('#expand-saved').click(function() {
-//    $('#saved').toggleClass('showSideWindow')
-//    });
-    
-    
-
-//push notices
-
-//$('#find-me').click(function(){
-//    setTimeout(function(){
-//        Push.create('found you.')
-//},5000);
-//});
 
 });
    
@@ -380,9 +334,9 @@ const hideWindow = (e) => {
 </div>
     
     
-<div class="container" onclick="closeNav()">
+<div class="height-100" onclick="closeNav()">
     
-    <div class="flex-container">
+    <div class="flexin height-100">
         
       <div class="main-contain-centered">
           
@@ -408,10 +362,8 @@ const hideWindow = (e) => {
 
       
 <script>
-    // navigation/location functions
-//use mapquest api to reverse geocode: http://www.mapquestapi.com/geocoding/v1/reverse?key=KEY&location=30.333472,-81.470448
-
-    //sorting functions
+    
+//sorting functions
 const sortByRating = (bizSearchResults) => {
     return Array.from(bizSearchResults).sort((h ,l) => l.rating - h.rating);
 }
@@ -420,10 +372,7 @@ const sortByDistance = (bizSearchResults) => {
 }
 
 
-
-
-    
-// core functions   
+// pretty format functions
 const printLocation = (array) => {
     var printedAddress = "";
     $.each(array, function(i, val){
@@ -439,69 +388,114 @@ const printCategories = (array) => {
     })
     return printedCategories;
 }
-//for results side
+
+
+//for results side. displays businesses after search
 const storeBusinessinResults = (business) => {
     business.forEach(function(val){
-     
-            var locationArray = val.location.display_address;
-            var categoriesArray = val.categories;
-            var businessName = `<h1 class="business-title" id="biz-title">${val.name}</h1>`;
-            var businessCategories = `<p id="biz-categories">${printCategories(categoriesArray)}</p>`;
-            var businessLocation = `<p id="biz-location">${printLocation(locationArray)}</p>`;
-            var businessImage = `<p><img id="biz-img" class="img-contain" src=${val.image_url}></p>`;
-            var businessRating = `<p>Rating: ${val.rating}</p>`;
-            var saveBusiness = `<button class="save-button generic-button" onclick="saveBusiness(this, bizSearchResults)">Save this place.</button>`;
-            var navigateButton = `<button class="navigate-button generic-button" onclick="openBusinessInMaps(this)"><i class="far fa-map"></i></button>`;
-                //
-            return ($("#result .content").append(`<div class="businesses" data-bizid=${val.id}>${businessName}${businessCategories}${businessLocation}${businessImage}${businessRating}${saveBusiness}${navigateButton}</div>`))
-        
+        var locationArray = val.location.display_address;
+        var categoriesArray = val.categories;
+        var businessName = `<h1 class="business-title" id="biz-title">${val.name}</h1>`;
+        var businessCategories = `<p id="biz-categories">${printCategories(categoriesArray)}</p>`;
+        var businessLocation = `<p id="biz-location">${printLocation(locationArray)}</p>`;
+        var businessImage = `<p><img id="biz-img" class="img-contain" src=${val.image_url}></p>`;
+        var businessRating = `<p>Rating: ${val.rating}</p>`;
+        var saveBusiness = `<div class="flexin"><button class="save-button generic-button" onclick="saveBusiness(this, bizSearchResults)">Save this place.</button>`;
+        var navigateButton = `<button class="navigate-button generic-button" data-location="${printLocation(locationArray)}" onclick="openBusinessInMaps(this)"><i class="far fa-map"></i></button></div>`;
+        //
+        return ($("#result .content").append(`<div class="businesses" data-bizid=${val.id}>${businessName}${businessCategories}${businessLocation}${businessImage}${businessRating}${saveBusiness}${navigateButton}</div>`))
     })
-    return
 }
 
 // get items in local storage, return array
 const getSavedBusinesses = () => {
-    var savedBusinesses = [];
+    var savedBusinesses;
     if ('businesses' in localStorage){
         savedBusinesses = JSON.parse(localStorage.getItem('businesses'));
     }
     return savedBusinesses
 }
 
-// display items from local storage for saved side
+// display items from local storage for saved side. also adds newly saved businesses. arg is array
 const storeBusinessinSaved = (bizArray) => {
     bizArray.forEach(function(i){
         var businessName = `<h1 class="business-title">${i.name}</h1>`;
         var businessCategories = `<p>${i.categories}</p>`;
         var businessLocation = `<p>${i.location}</p>`;
         var businessImage = `<p><img class="img-contain" src=${i.img}></p>`;
-        var removeBusiness = `<button class="remove-button generic-button" onclick="removeBusiness(this)">Remove from saved.</button>`;
-        var navigateButton = `<button class="navigate-button generic-button" onclick="openSavedBusinessInMaps(this)" data-location="${i.location}"><i class="far fa-map"></i></button>`;
-        return ($("#saved .content").append(`<div class="businesses" data-bizid="${i.id}">${businessName}${businessCategories}${businessLocation}${businessImage}${removeBusiness}${navigateButton}</div>`))
+        var navigateButton = `<div class="flexin"><button class="navigate-button generic-button" onclick="openBusinessInMaps(this)" data-location="${i.location}"><i class="far fa-map"></i></button>`;
+        var removeBusiness = `<button class="remove-button generic-button" onclick="removeBusiness(this)">Remove</button></div>`;
+        //
+        return ($("#saved .content").append(`<div class="businesses" data-bizid="${i.id}">${businessName}${businessCategories}${businessLocation}${businessImage}${navigateButton}${removeBusiness}</div>`))
     })
 }
 
-storeBusinessinSaved(getSavedBusinesses());
+// location functions //
+const insertAddress = (lat, long) => {
+    //return printed address from mapquest api
+    var currentLocationString = "";
+    var url = `https://www.mapquestapi.com/geocoding/v1/reverse?key=IAgZTUY6CHjddilw58OA0RkulD9TIhNF&location=${lat},${long}`;
+    $.ajax({
+        url: url,
+        success: function(response){
+            currentLocationString = `${response.results[0].locations[0].street}, ${response.results[0].locations[0].adminArea5}, ${response.results[0].locations[0].adminArea3}`;
+            $("#location").val(currentLocationString);
+            // remove loading gif
+            hideShowSearchSpinner();
+        },
+        error: function(){
+            alert('error!')
+        }
+    })
+}    
 
-    
-    
-    
-    
+const locationSuccess = (position) => {
+    // return a city/state string from lat and long
+    var lat = position.coords.latitude;
+    var long = position.coords.longitude;
+    insertAddress(lat, long);
 
-// for dev... clear localstorage
-const clearLocalStorage = () => {
-    localStorage.clear();
-    return ('local storage cleared')
+}
+const locationError = () => {
+    hideShowSearchSpinner();
 }
 
+const findMe = () => {
+    navigator.geolocation.getCurrentPosition(locationSuccess, locationError);
+}
+
+const hideShowSearchSpinner = () => {
+    var array = Array.from(document.getElementById('submit').children);
+    array.forEach(function(element){
+        element.classList.toggle('hidden')
+    })
+}
+
+document.getElementById('find-me').addEventListener('click', function(){
+    hideShowSearchSpinner();
+    findMe();
+});
+
+
+
+
+
+// make sure to retrieve saved data from local storage on page load
+window.onload = function(){
+    storeBusinessinSaved(getSavedBusinesses());
+}
+
+//get current location on load
+findMe();
+    
 //add business to localstorage & display in save column
 const saveBusiness = (event, searchResults) => {
     var data = {
-        'id' : event.parentElement.getAttribute('data-bizid'),
-        'name': event.parentElement.querySelector('#biz-title').innerHTML,
-        'categories': event.parentElement.querySelector('#biz-categories').innerHTML,
-        'location': event.parentElement.querySelector('#biz-location').innerHTML,
-        'img': event.parentElement.querySelector('#biz-img').getAttribute('src')
+        'id' : event.parentElement.parentElement.getAttribute('data-bizid'),
+        'name': event.parentElement.parentElement.querySelector('#biz-title').innerHTML,
+        'categories': event.parentElement.parentElement.querySelector('#biz-categories').innerHTML,
+        'location': event.parentElement.parentElement.querySelector('#biz-location').innerHTML,
+        'img': event.parentElement.parentElement.querySelector('#biz-img').getAttribute('src')
     }
     var savedBusinesses = getSavedBusinesses();
     var doesBizExist = savedBusinesses.filter(index => index.id == data.id);
@@ -511,28 +505,34 @@ const saveBusiness = (event, searchResults) => {
         storeBusinessinSaved(Array(data))//need to convert to array to fit the function
         localStorage.setItem('businesses', JSON.stringify(savedBusinesses));
     }else{
-        console.log('already saved this place')
+        alert('you already saved this place.')
     }
 }
 
-
 const removeBusiness = (domElement) => {
-    var businessToRemove = domElement.parentElement;
+    var businessToRemove = domElement.parentElement.parentElement;
     var localStorageArray = getSavedBusinesses();
-    var doesBizExist = localStorageArray.filter(index => index.id != businessToRemove.getAttribute('data-bizid'));
-    
+    //returns array of businesses after removal
+    var updatedBusinessList = localStorageArray.filter(index => index.id != businessToRemove.getAttribute('data-bizid'));
+    //remove from DOM
     businessToRemove.remove();
-    localStorage.setItem('businesses', JSON.stringify(doesBizExist))
+    //reset local storage
+    localStorage.setItem('businesses', JSON.stringify(updatedBusinessList))
 }
 
 const openBusinessInMaps = (event) => {
-    window.open(`https://www.google.com/maps/place/${event.parentElement.querySelector('#biz-location').innerHTML}`)
-}
-const openSavedBusinessInMaps = (event) => {
     window.open(`https://www.google.com/maps/place/${event.getAttribute('data-location')}`)
 }
 
-      </script>
+// for dev... clear localstorage
+const clearLocalStorage = () => {
+    localStorage.clear();
+    return ('local storage cleared')
+}
+</script>
+
+    
+<!-- DOM javascript -->
 <script>
 
 function openLeftNav() {
