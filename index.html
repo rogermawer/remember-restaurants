@@ -287,8 +287,13 @@ $('#sort-rating').click(function(){
 })
 $('#sort-distance').click(function(){
     $('#result .content').empty();
+    console.log(bizSearchResults)
     var results = sortByDistance(bizSearchResults);
     storeBusinessinResults(results);
+})
+$('#random-saved').click(function(){
+    $('#saved .content').empty();
+    randomPick(getSavedBusinesses());
 })
 
 });
@@ -330,6 +335,9 @@ const hideWindow = (e) => {
 </div>
         
 <div class="nav" id="saved">
+    <div class="side-menu">
+        <button id="random-saved" class="generic-button">Random Pick</button>
+    </div>
     <div class="content" style="padding-top:40px"></div>
 </div>
     
@@ -365,11 +373,17 @@ const hideWindow = (e) => {
     
 //sorting functions
 const sortByRating = (bizSearchResults) => {
-    return Array.from(bizSearchResults).sort((h ,l) => l.rating - h.rating);
+    return Array.from(bizSearchResults).sort((high ,low) => low.rating - high.rating);
 }
 const sortByDistance = (bizSearchResults) => {
-    return Array.from(bizSearchResults).sort((c ,f) => c.distance - f.distance);
+    return Array.from(bizSearchResults).sort((close ,far) => close.distance - far.distance);
 }
+
+const randomPick = (savedBusinesses) => {
+    var randomSelect = savedBusinesses[Math.floor(Math.random() * (savedBusinesses.length - 0))];
+    storeBusinessinSaved(Array(randomSelect))
+}
+
 
 
 // pretty format functions
@@ -413,7 +427,7 @@ const getSavedBusinesses = () => {
     if ('businesses' in localStorage){
         savedBusinesses = JSON.parse(localStorage.getItem('businesses'));
     }
-    return savedBusinesses
+    return savedBusinesses;
 }
 
 // display items from local storage for saved side. also adds newly saved businesses. arg is array
@@ -426,8 +440,8 @@ const storeBusinessinSaved = (bizArray) => {
         var navigateButton = `<div class="flexin"><button class="navigate-button generic-button" onclick="openBusinessInMaps(this)" data-location="${i.location}"><i class="far fa-map"></i></button>`;
         var removeBusiness = `<button class="remove-button generic-button" onclick="removeBusiness(this)">Remove</button></div>`;
         //
-        return ($("#saved .content").append(`<div class="businesses" data-bizid="${i.id}">${businessName}${businessCategories}${businessLocation}${businessImage}${navigateButton}${removeBusiness}</div>`))
-    })
+        return ($("#saved .content").append(`<div class="businesses" data-bizid="${i.id}">${businessName}${businessCategories}${businessLocation}${businessImage}${navigateButton}${removeBusiness}</div>`));
+    });
 }
 
 // location functions //
@@ -502,6 +516,7 @@ const saveBusiness = (event, searchResults) => {
     if (doesBizExist.length <= 0){
         //if doesnt exists then save it.
         savedBusinesses.push(data); 
+        console.log(Array(data))
         storeBusinessinSaved(Array(data))//need to convert to array to fit the function
         localStorage.setItem('businesses', JSON.stringify(savedBusinesses));
     }else{
@@ -523,6 +538,9 @@ const removeBusiness = (domElement) => {
 const openBusinessInMaps = (event) => {
     window.open(`https://www.google.com/maps/place/${event.getAttribute('data-location')}`)
 }
+
+
+
 
 // for dev... clear localstorage
 const clearLocalStorage = () => {
