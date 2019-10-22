@@ -1,12 +1,15 @@
-const express = require('express')
-const app = express()
-const port = 3000
+const express = require('express');
+const app = express();
+const cors = require('cors');
+const port = 3000;
+
 
 app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'));
 
 //process.env.PORT allows to look on all ports.
 app.listen(process.env.PORT || port, () => console.log(`Listening on port ${port}!`))
 
+app.use(cors());
 //load images
 app.use(express.static('public'));
 
