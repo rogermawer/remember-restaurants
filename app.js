@@ -26,7 +26,7 @@ const client = yelp.client(apiKey);
 
 app.post('/search', [
     check('restaurant').trim().escape(),
-    check('location').trim().escape()
+    check('location').isLength({min: 1}).trim().escape()
 ], (req, res) => {
     var validationErrors = validationResult(req);
     searchTerm = {
@@ -45,10 +45,9 @@ app.post('/search', [
         }).catch(e => {
             //if error
             res.status(500).jsonp(e)
-            console.log(e.response.body);
         });
     }else {
-        console.log(searchTerm.term)
+        // if errors in validation
         res.status(422).jsonp(validationErrors.array())
     }
 });

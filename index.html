@@ -17,8 +17,10 @@
     
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<!--
     <script src="js/push.js"></script>
       <script src="js/serviceWorker.min.js"></script>
+-->
     
    
 <style>
@@ -143,7 +145,10 @@
         margin-left: 2px;
         cursor: pointer
     }
-     .align-right {
+    .error{
+        border: 2px solid red
+    }
+    .align-right {
         margin-left: auto
     }
     .hidden{
@@ -260,25 +265,31 @@ $(document).ready(function(){
         location: $('input[name="location"]').val()
         };
         
-        $.post(url, searchTerm)
-            .done(function(result){
-                openLeftNav();
-                // if no results...
-                if (result.length < 1){
-                    $("#result .content").html(`Didn't find any results for that.`);
-                }else{
-                    //otherwise...
-                    bizSearchResults = result;
-                    storeBusinessinResults(bizSearchResults);
-                }
-                hideShowSearchSpinner(); //stop spinner
-            })
-            // handle server side rejections...
-            .fail(function(xhr, status, error){
-                $("#result .content").html(`Server rejected input. Status ${xhr.status}`);
-                openLeftNav();
-                hideShowSearchSpinner(); //stop spinner
-            }) 
+        if (searchTerm.location.length > 1) {
+            $.post(url, searchTerm)
+                .done(function(result){
+                    openLeftNav();
+                    // if no results...
+                    if (result.length < 1){
+                        $("#result .content").html(`Didn't find any results for that.`);
+                    }else{
+                        //otherwise...
+                        bizSearchResults = result;
+                        storeBusinessinResults(bizSearchResults);
+                    }
+                    hideShowSearchSpinner(); //stop spinner
+                })
+                // handle server side rejections...
+                .fail(function(xhr, status, error){
+                    $("#result .content").html(`Server rejected input. Status ${xhr.status}`);
+                    openLeftNav();
+                    hideShowSearchSpinner(); //stop spinner
+                }) 
+        }else{
+            $("#result .content").html(`Try entering a location when you search.`);
+            setTimeout(openLeftNav, 100); // work around to open side nav before close is called.
+            hideShowSearchSpinner(); //stop spinner
+        }
     }) 
     
 $('#sort-rating').click(function(){
@@ -351,13 +362,13 @@ const hideWindow = (e) => {
           
           <div class="form-container">
             <h1 class="business-title">remember a restaurant</h1>
-            <form class="searchForm" method="POST" action="/search">
+            <form id="search-form" class="searchForm" method="POST" action="/search">
               <input type="text" name="restaurant">
-              <input id="location" type="text" value="" name="location">
-            </form>
+              <input id="location" type="text" placeholder="enter a location" value="" name="location">
+              </form>
               
               <div style="width: 200px;justify-content: center;display: flex">
-                  <button id="submit" class="generic-button" value="Submit!" type="submit"><i class="fas fa-search hidden"></i><i class="fas fa-spinner fa-pulse"></i></button>
+                  <button id="submit" class="generic-button" value="Submit!" form="search-form" type="submit"><i class="fas fa-search hidden"></i><i class="fas fa-spinner fa-pulse"></i></button>
                   <button id="find-me" class="generic-button" style="width: 20%;background-color: #8fb57e"><i class="fas fa-map-marker-alt"></i></button>
               </div>
           </div>
@@ -427,6 +438,8 @@ const getSavedBusinesses = () => {
     var savedBusinesses;
     if ('businesses' in localStorage){
         savedBusinesses = JSON.parse(localStorage.getItem('businesses'));
+    }else{
+        savedBusinesses = [];
     }
     return savedBusinesses;
 }
@@ -454,6 +467,7 @@ const insertAddress = (lat, long) => {
         url: url,
         success: function(response){
             currentLocationString = `${response.results[0].locations[0].street}, ${response.results[0].locations[0].adminArea5}, ${response.results[0].locations[0].adminArea3}`;
+            $('#location').attr('placeholder', 'enter location'); //reset placeholder
             $("#location").val(currentLocationString);
             // remove loading gif
             hideShowSearchSpinner();
@@ -471,11 +485,20 @@ const locationSuccess = (position) => {
     insertAddress(lat, long);
 
 }
-const locationError = () => {
+const locationError = (error) => {
+    if (error.code === 1) { //user denied location
+        alert(`For best results, you should enable browser location.`)
+    }else if (error.code === 2) { //network error
+        alert(`Could'nt connect to network. Is WIFI on?`)
+    } else {
+        alert(`Couldn't get location data.`)
+    }
+    document.getElementById('location').setAttribute('placeholder', 'could not find location');
     hideShowSearchSpinner();
 }
 
 const findMe = () => {
+    document.getElementById('location').setAttribute('placeholder', 'finding location...');
     navigator.geolocation.getCurrentPosition(locationSuccess, locationError);
 }
 
@@ -517,9 +540,9 @@ const saveBusiness = (event, searchResults) => {
     if (doesBizExist.length <= 0){
         //if doesnt exists then save it.
         savedBusinesses.push(data); 
-        console.log(Array(data))
         storeBusinessinSaved(Array(data))//need to convert to array to fit the function
         localStorage.setItem('businesses', JSON.stringify(savedBusinesses));
+        alert('saved! wahoo!');
     }else{
         alert('you already saved this place.')
     }
@@ -553,17 +576,19 @@ const clearLocalStorage = () => {
     
 <!-- DOM javascript -->
 <script>
-
+function closeNav() {
+    console.log('close')
+    document.getElementById("result").classList.remove('opened');
+    document.getElementById("saved").classList.remove('opened');
+}
 function openLeftNav() {
+    console.log('open')
   document.getElementById("result").classList.toggle('opened');
 }
 function openRightNav() {
   document.getElementById("saved").classList.toggle('opened');
 }
-function closeNav() {
-    document.getElementById("result").classList.remove('opened');
-    document.getElementById("saved").classList.remove('opened');
-}
+
 </script>
       
     
