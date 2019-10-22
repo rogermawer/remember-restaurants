@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const {check, validationResult} = require('express-validator');
 const cors = require('cors');
 const port = 3000;
 
@@ -23,26 +24,33 @@ app.use(express.urlencoded());
 
 const client = yelp.client(apiKey);
 
-app.post('/search', (req, res) => {
-    var restaurantName = req.body.restaurant;
-    var restaurantLocation = req.body.location;
+app.post('/search', [
+    check('restaurant').trim().escape(),
+    check('location').trim().escape()
+], (req, res) => {
+    var validationErrors = validationResult(req);
     searchTerm = {
-        term: restaurantName,
-        location: restaurantLocation
+        term: req.body.restaurant,
+        location: req.body.location
     }
-    client.search(searchTerm).then(response => {
-        var firstResult = response.jsonBody.businesses;
-        var prettyJson = JSON.stringify(firstResult, null, 4);
-        var resultImage = firstResult.image_url;
-        res.send(firstResult); //this data gets sent to index.html
-        app.route('/results').get(function(req, res) {
-            res.send(firstResult);
-        })
-        
+    if (validationErrors.isEmpty()){
+        client.search(searchTerm).then(response => {
+            var firstResult = response.jsonBody.businesses;
+            var prettyJson = JSON.stringify(firstResult, null, 4);
+            var resultImage = firstResult.image_url;
+            res.send(firstResult); //this data gets sent to index.html
+            app.route('/results').get(function(req, res) {
+                res.send(firstResult);
+            })
         }).catch(e => {
-        //if error
-            res.send(e);
+            //if error
+            res.status(500).jsonp(e)
+            console.log(e.response.body);
         });
+    }else {
+        console.log(searchTerm.term)
+        res.status(422).jsonp(validationErrors.array())
+    }
 });
 
 

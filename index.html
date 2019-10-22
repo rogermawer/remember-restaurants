@@ -249,35 +249,36 @@
 <script>
 var bizSearchResults; //store api call result here to prevent recalls
 $(document).ready(function(){
-    const url = 'https://remember-restaurants.herokuapp.com/search';
+    const url = '/search';
     $('#submit').click(function(e){
         e.preventDefault();
-        hideShowSearchSpinner();
-        
-        // TODO add loading icon
-        
-        // open the hidden window
-        $('#result .content').empty(); //clear items in result div EXCEPT the button to close so new search appears at top
+        hideShowSearchSpinner(); // start spinner
+    
+        $('#result .content').empty(); //clear items in result div 
         var searchTerm = {
         restaurant: $('input[name="restaurant"]').val(),
         location: $('input[name="location"]').val()
         };
-        $.post(url, searchTerm, function(result){
-            // if didnt find results for search...
-            try{
+        
+        $.post(url, searchTerm)
+            .done(function(result){
                 openLeftNav();
+                // if no results...
                 if (result.length < 1){
-                    $("#result .content").html(`Didn't find any results for that.`)
+                    $("#result .content").html(`Didn't find any results for that.`);
                 }else{
                     //otherwise...
                     bizSearchResults = result;
                     storeBusinessinResults(bizSearchResults);
-                    hideShowSearchSpinner();
                 }
-            }catch(error){
-                $("#result .content").html(`Couldn't find your location. Try typing in an address or city?`)
-            }
-        })
+                hideShowSearchSpinner(); //stop spinner
+            })
+            // handle server side rejections...
+            .fail(function(xhr, status, error){
+                $("#result .content").html(`Server rejected input. Status ${xhr.status}`);
+                openLeftNav();
+                hideShowSearchSpinner(); //stop spinner
+            }) 
     }) 
     
 $('#sort-rating').click(function(){
