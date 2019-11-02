@@ -1,0 +1,226 @@
+::-webkit-scrollbar {
+        display: none
+    }
+    
+    html, body {
+        font-family: 'Roboto', sans-serif;
+        font-weight: 300;
+        height:100%;
+        margin: 0;
+        padding: 0;
+        background: rgb(58, 58, 58)
+    }
+    input, button{
+        font-family: 'Roboto', sans-serif;
+        font-weight: 400;
+    }
+    p, button{
+        font-family: 'Roboto', sans-serif;
+        font-weight: 300;
+        margin:0;
+        padding:0;
+    }
+    h1{
+        font-weight: 300
+    }
+    .height-100{
+        height: 100%
+    }
+    .flexin{
+        display: flex;
+        flex-direction: row;
+    }
+    .flex-container{
+        height: 100%;
+    }
+    .form-container{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+    .main-contain-centered{
+        flex-grow: 1;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .searchForm {
+        width: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center
+    }
+    .searchForm input {
+        width:100%;
+        height:20px;
+        margin-top:1em;
+        margin-bottom:1em
+    }
+    #submit {
+        width:50%;
+        border:none;
+        cursor:pointer;
+        background-color: yellow;
+    }
+
+    /* nav style */
+    
+    .nav{
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow-y:scroll;
+        width:0;
+    }
+    .loading{
+        line-height: 0px;
+    }
+    
+    .content{
+        padding:20px;
+    }
+    
+    .img-contain{
+        width:100%;
+        max-width: 600px;
+        max-height: 600px;
+        object-fit: cover;
+    }
+    i{
+        font-size: 20px;
+        line-height: 0px;
+        
+    }
+    
+    .save-button{
+        padding: 5px 10px 5px 10px;
+        background-color: yellow;
+    }
+    .remove-button{
+        background-color: #F84343;
+        color: #eeeeee
+    }
+    .navigate-button{
+        background-color: #8fb57e;
+    }
+    .expand-button{
+        flex-direction: row;
+        width:75px;
+    }
+    .generic-button{
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        border: none;
+        font-size: 15px;
+        margin-left: 2px;
+        cursor: pointer
+    }
+    .utility{
+        background-color:#00c0ff
+    }
+    .error{
+        border: 2px solid red
+    }
+    .align-right {
+        margin-left: auto
+    }
+    .hidden{
+        display: none!important
+    }
+    .showSideWindow{
+        width:50%!important;
+    }
+    #result{
+        background-color:#eeeeee;
+        background: rgba(75, 75, 75, 0.8);
+        color: #fff;
+        transition: .2s
+    }
+    #saved{
+        background-color: #eeeeee;
+        right:0;
+        background: rgba(75, 75, 75, 0.8);
+        color: #fff;
+        transition: .2s
+    }
+    .business-title{
+        color: #F84343
+    }
+    #expand-saved{
+        cursor: pointer
+    }
+    #expand-results{
+        cursor: pointer
+    }
+    .side-menu{
+        display: flex;
+        flex-flow: row;
+        justify-content: flex-start;
+        padding-left: 20px;
+        margin-top:70px
+    }
+    
+    .menu {
+        position: absolute;
+        display: flex;
+        flex-direction: row;
+        right:0;
+        list-style:none;
+        margin:0;
+        padding:10px;
+        z-index: 99
+    }
+    .menu li{
+        border:1px solid black;
+        border-radius: 5px;
+        color: black;
+        background-color: yellow;
+        padding: 10px 10px 10px 10px;
+    }
+    .businesses{
+        display: flex;
+        flex-flow: column;
+    }
+    .opened{
+        width:50%
+    }
+    
+.sidenav {
+  height: 100%; 
+  width: 0; 
+  position: fixed;
+  z-index: 1; 
+  top: 0; 
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden; 
+  padding-top: 60px; 
+  transition: 0.5s;
+}
+.sidenav a{
+  display: block;
+}
+.sidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+  color: #fff;
+}
+#menu-icon{
+    position: absolute;
+  padding:20px;
+  cursor: pointer;
+  font-size: 25px
+}
+    
+/* MEDIA QUERIES */
+    
+@media only screen and (max-width: 600px) {
+    .opened{width:80%}
+}
