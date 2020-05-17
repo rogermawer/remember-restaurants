@@ -1,22 +1,15 @@
 <template>
   <div>
       <v-container>
-        <v-row>
-          <v-col cols="6" sm="3">
-              <v-select
-                label="filter by"
-                v-model="selectedFilter"
-                v-bind:items="filters"
-                @input="filterBy(selectedFilter)"
-                >
-              </v-select>
-          </v-col>
-        </v-row>
+        <ResultFilter
+          v-bind:whatToFilter="transitSearchResults"
+        ></ResultFilter>
+       
           <v-row align="center" justify="center">
             <v-col cols="12" md="4" sm="6" v-for="result in transitSearchResults" v-bind:key="result.id">
 
               <v-card>
-                <v-card-title><a target="_blank" v-bind:href="result.url">{{result.name}}</a></v-card-title>
+                <v-card-title><a target="_blank" v-bind:href="result.url">{{result.bizname}}</a></v-card-title>
                 <v-card-text class="pb-0">{{result.location}}</v-card-text>
                 <v-rating
                   class="ml-1" 
@@ -28,13 +21,13 @@
                   readonly
                   >
                 </v-rating>
-                <v-card-text class="pt-0">{{result.reviews}} reviews</v-card-text>
+                <v-card-text class="pt-0">{{result.numreviews}} reviews</v-card-text>
                 <v-img v-bind:src="result.image" aspect-ratio="1"></v-img>
                 <v-card-actions>
-                  <v-btn icon @click="saveRestaurant(result.id)">
+                  <v-btn icon @click="saveRestaurant(result.bizid)">
                     <v-icon>mdi-heart</v-icon>
                   </v-btn>
-                  <v-btn icon>
+                  <v-btn icon @click="mapToRestaurant(result.location)">
                     <v-icon>mdi-map-marker</v-icon>
                   </v-btn>
                 </v-card-actions>
@@ -56,44 +49,37 @@
 </template>
 
 <script>
+import {EventBus} from '@/event-bus.js';
+import ResultFilter from '@/components/ResultFilter.vue';
+
   export default {
     name: 'SearchResults',
+    components: {
+      ResultFilter
+    },
     props:['transitSearchResults', 'mySavedRestaurants'],
     data: () => ({
       savedAlert: {
         shown: false,
         msg: null
-      },
-      filters:['distance', 'rating'],
-      selectedFilter: null,
+      }
     }),
     methods: {
       saveRestaurant: function(restaurantId) {
         var savedRestaurant = this.transitSearchResults.filter(restaurant => {
-          return restaurantId == restaurant.id
+          return restaurantId == restaurant.bizid
         })
         //check if saved restaurant is already saved
-        if (!this.mySavedRestaurants.filter((res) => {return res.id == savedRestaurant[0].id}).length > 0) {
-          this.$emit('saved-restaurant', savedRestaurant[0])
+        if (!this.mySavedRestaurants.filter((res) => {return res.bizid == savedRestaurant[0].bizid}).length > 0) {
+          EventBus.$emit('saved-restaurant', savedRestaurant[0])
           this.savedAlert = {shown: true, msg: 'saved!'};
         }else{
           this.savedAlert = {shown: true, msg: 'this place is already saved!'};
         }
       },
-      filterByDistance (values){
-        this.transitSearchResults = values.sort((a, b) => {return a.distance - b.distance})
-      },
-      filterByRating (values){
-        this.transitSearchResults = values.sort((a, b) => {return b.rating - a.rating})
-      },
-      filterBy (filter) {
-        if (filter === 'distance') {
-          this.filterByDistance(this.transitSearchResults)
-        }
-        if (filter === 'rating') {
-          this.filterByRating(this.transitSearchResults)
-        }
-      }
+      mapToRestaurant: function(address) {
+        window.open(`https://www.google.com/maps/place/${address}`, "_blank")
+    }
     }
   }
 </script>

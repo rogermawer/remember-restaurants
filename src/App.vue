@@ -5,7 +5,7 @@
       dark
     >
       <div>
-        <h3 class="mb-0">remember restaurants</h3>
+        <h3 class="mb-0">remember restaurants - Hi {{loggedInUser.name}}!</h3>
       </div>
 
       <v-spacer></v-spacer>
@@ -21,11 +21,8 @@
       name="fade"
       mode="out-in">
       <router-view 
-        @search-results-to-parent="saveSearchResults" 
         v-bind:transitSearchResults="savedResults"
-        @saved-restaurants-to-parent="saveRestaurant"
-        v-bind:mySavedRestaurants="mySavedRestaurants"
-        @delete-restaurant="deleteRestaurant"/>
+        v-bind:mySavedRestaurants="mySavedRestaurants"/>
     </transition>
 
     </v-content>
@@ -34,7 +31,8 @@
 </template>
 
 <script>
-
+import axios from 'axios';
+import {EventBus} from '@/event-bus.js';
 
 export default {
   name: 'App',
@@ -44,30 +42,66 @@ export default {
 
   data: () => ({
     savedResults: [],
-    mySavedRestaurants: []
+    mySavedRestaurants: [],
+    loggedInUser: {
+      id: null, 
+      name: null
+    }
   }),
   mounted: function(){
-    this.getSavedRestaurants()
+    this.getUserData(),
+    this.getSavedRestaurants(),
+    EventBus.$on('send-search-results', this.saveSearchResults),
+    EventBus.$on('saved-restaurant', this.saveRestaurant),
+    EventBus.$on('delete-restaurant', this.deleteRestaurant)
   },
   methods: {
+    getUserData () {
+      axios.get('http://localhost:3000/api/userdata')
+      .then((res) => {
+        this.loggedInUser = {id: res.data.id, name: res.data.username};
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    },
     getSavedRestaurants () {
-      console.log('getting saved restaurants form DB, emit to parent')
+      axios.get('http://localhost:3000/api/saveddata')
+      .then((res) => {
+        this.mySavedRestaurants = res.data;
+      })
+      .catch((err) => {
+        console.log(err)
+      })
     },
     saveSearchResults (value){
       this.savedResults = [];
       this.savedResults = value;
     },
     saveRestaurant (value) {
-      this.mySavedRestaurants.push(value);
-      this.updateDataBase(value);
+      axios.post('http://localhost:3000/api/save', value)
+      .then((res) => {
+        value.id = res.data.id;
+        this.mySavedRestaurants.push(value);
+      })
+      .catch((err) => {
+        //error saving to DB
+        console.log(err)
+      })
     },
-    deleteRestaurant (updatedArray, id) {
+    deleteRestaurant (id) {
+      var updatedArray = this.mySavedRestaurants.filter((item) => {return item.id != id})
       this.mySavedRestaurants = updatedArray;
-      this.updateDataBase(id);
+      axios.post('http://localhost:3000/api/delete', {id: id})
+      .then((res) => {
+        //success
+        console.log(res)
+      })
+      .catch((err) => {
+        //error saving to DB
+        console.log(err)
+      })
     },
-    updateDataBase (savedRestaurant) {
-      console.log('update DB with newly saved restaurant', savedRestaurant)
-    }
   }
 };
 </script>

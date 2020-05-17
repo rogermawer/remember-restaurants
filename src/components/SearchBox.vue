@@ -29,6 +29,8 @@
 
 <script>
 import axios from 'axios'
+import {EventBus} from '@/event-bus.js'
+
   export default {
     name: 'SearchBox',
     data: () => ({
@@ -43,24 +45,23 @@ import axios from 'axios'
     },
     methods: {
       searchForBusiness: function (e){
-        var vm = this;
         e.preventDefault();
         axios.post('http://localhost:3000/api/search', this.searchTerm)
         .then((res) => {
           var condensedRestaurantInfo = [];
           res.data.forEach((result)=> {
             condensedRestaurantInfo.push({
-              id: result.id,
-              name: result.name, 
+              bizid: result.id,
+              bizname: result.name, 
               image: result.image_url, 
               url: result.url,
               location: result.location.display_address[0], 
               rating: result.rating, 
-              reviews: result.review_count,
-              distance: result.distance
+              numreviews: result.review_count,
+              distance: result.distance // not saved in db, only makes sense for current search
             })
           })
-          vm.$emit('send-search-results', condensedRestaurantInfo) 
+          EventBus.$emit('send-search-results', condensedRestaurantInfo) 
         })
         .catch((err) => {
           console.log(err)

@@ -12,7 +12,6 @@
           mode="out-in">
           <SearchResults 
             v-if="transitSearchResults.length > 1"
-            @saved-restaurant="savedRestaurantToParent" 
             v-bind:transitSearchResults="transitSearchResults"
             v-bind:mySavedRestaurants="mySavedRestaurants">
           </SearchResults>
