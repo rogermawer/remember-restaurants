@@ -44,7 +44,7 @@ export default {
     this.findMyLocation();
   },
   methods: {
-    searchForBusiness: function(e) {
+    searchForBusiness: function() {
       // e.preventDefault();
       axios
         .post("http://localhost:3000/api/search", this.searchTerm)
