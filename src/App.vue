@@ -1,116 +1,114 @@
 <template>
   <v-app>
-    <v-app-bar class="background-color"
-      app
-      dark
-    >
+    <v-app-bar class="background-color" app dark>
       <div>
-        <h3 class="mb-0">remember restaurants - Hi {{loggedInUser.name}}!</h3>
+        <h3 class="mb-0">remember restaurants - Hi {{ loggedInUser.name }}!</h3>
       </div>
 
       <v-spacer></v-spacer>
 
-    <router-link class="nav-link" to="/">home</router-link>
-    <router-link class="nav-link" to="/remembered">remembered</router-link>
-
+      <router-link class="nav-link" to="/">home</router-link>
+      <router-link class="nav-link" to="/remembered">remembered</router-link>
     </v-app-bar>
-    
+
     <v-content>
-
-    <transition
-      name="fade"
-      mode="out-in">
-      <router-view 
-        v-bind:transitSearchResults="savedResults"
-        v-bind:mySavedRestaurants="mySavedRestaurants"/>
-    </transition>
-
+      <transition name="fade" mode="out-in">
+        <router-view
+          v-bind:transitSearchResults="savedResults"
+          v-bind:mySavedRestaurants="mySavedRestaurants"
+        />
+      </transition>
     </v-content>
-
   </v-app>
 </template>
 
 <script>
-import axios from 'axios';
-import {EventBus} from '@/event-bus.js';
+import axios from "axios";
+import { EventBus } from "@/event-bus.js";
 
 export default {
-  name: 'App',
-  components: {
-  
-  },
+  name: "App",
+  components: {},
 
   data: () => ({
     savedResults: [],
     mySavedRestaurants: [],
     loggedInUser: {
-      id: null, 
-      name: null
-    }
+      id: null,
+      name: null,
+    },
   }),
-  mounted: function(){
+  mounted: function() {
     this.getUserData(),
-    this.getSavedRestaurants(),
-    EventBus.$on('send-search-results', this.saveSearchResults),
-    EventBus.$on('saved-restaurant', this.saveRestaurant),
-    EventBus.$on('delete-restaurant', this.deleteRestaurant)
+      this.getSavedRestaurants(),
+      EventBus.$on("send-search-results", this.saveSearchResults),
+      EventBus.$on("saved-restaurant", this.saveRestaurant),
+      EventBus.$on("delete-restaurant", this.deleteRestaurant);
   },
   methods: {
-    getUserData () {
-      axios.get('http://localhost:3000/api/userdata')
-      .then((res) => {
-        this.loggedInUser = {id: res.data.id, name: res.data.username};
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+    getUserData() {
+      axios
+        .get("/api/userdata")
+        .then((res) => {
+          this.loggedInUser = { id: res.data.id, name: res.data.username };
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
-    getSavedRestaurants () {
-      axios.get('http://localhost:3000/api/saveddata')
-      .then((res) => {
-        this.mySavedRestaurants = res.data;
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+    getSavedRestaurants() {
+      axios
+        .get("/api/saveddata")
+        .then((res) => {
+          this.mySavedRestaurants = res.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
-    saveSearchResults (value){
+    saveSearchResults(value) {
       this.savedResults = [];
       this.savedResults = value;
     },
-    saveRestaurant (value) {
-      axios.post('http://localhost:3000/api/save', value)
-      .then((res) => {
-        value.id = res.data.id;
-        this.mySavedRestaurants.push(value);
-      })
-      .catch((err) => {
-        //error saving to DB
-        console.log(err)
-      })
+    saveRestaurant(value) {
+      axios
+        .post("/api/save", value)
+        .then((res) => {
+          value.id = res.data.id;
+          this.mySavedRestaurants.push(value);
+        })
+        .catch((err) => {
+          //error saving to DB
+          console.log(err);
+        });
     },
-    deleteRestaurant (id) {
-      var updatedArray = this.mySavedRestaurants.filter((item) => {return item.id != id})
+    deleteRestaurant(id) {
+      var updatedArray = this.mySavedRestaurants.filter((item) => {
+        return item.id != id;
+      });
       this.mySavedRestaurants = updatedArray;
-      axios.post('http://localhost:3000/api/delete', {id: id})
-      .then((res) => {
-        //success
-        console.log(res)
-      })
-      .catch((err) => {
-        //error saving to DB
-        console.log(err)
-      })
+      axios
+        .post("/api/delete", { id: id })
+        .then((res) => {
+          //success
+          console.log(res);
+        })
+        .catch((err) => {
+          //error saving to DB
+          console.log(err);
+        });
     },
-  }
+  },
 };
 </script>
 
 <style scoped>
-.background-color{background-color: #3A3A3A!important}
-.nav-link{
-  color:white;
-  padding:0 10px 0 10px;
+.background-color {
+  background-color: #3a3a3a !important;
+}
+.nav-link {
+  color: white;
+  padding: 0 10px 0 10px;
 }
 
 .fade-enter-active,
@@ -122,8 +120,6 @@ export default {
 
 .fade-enter,
 .fade-leave-active {
-  opacity: 0
+  opacity: 0;
 }
-
-
 </style>

@@ -47,7 +47,7 @@ export default {
     searchForBusiness: function() {
       // e.preventDefault();
       axios
-        .post("http://localhost:3000/api/search", this.searchTerm)
+        .post("/api/search", this.searchTerm)
         .then((res) => {
           var condensedRestaurantInfo = [];
           res.data.forEach((result) => {
