@@ -45,7 +45,7 @@ export default {
   },
   methods: {
     searchForBusiness: function(e) {
-      e.preventDefault();
+      // e.preventDefault();
       axios
         .post("http://localhost:3000/api/search", this.searchTerm)
         .then((res) => {
